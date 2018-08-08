@@ -31,7 +31,7 @@ A Docker image `bdeinsalyon/mongobackup` is also available
 
 ## License
 
-This script is given under MIT License.
+This script is given under MIT License and GNU AGPLv3 sublicense.
 ```
 © 2017, Philippe VIENNE
 © 2018, François LALLEVÉ
