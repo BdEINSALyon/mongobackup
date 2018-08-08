@@ -42,7 +42,6 @@ def backup(database, ftp, mongodump):
     name = backup_name(database)
     path = '/tmp/' + name
     logging.info('Backup database to {}'.format(path))
-    db = dj_database_url.parse(database)
     s.bash('-c', '"'+' '.join([mongodump, '--uri', database]) + '"').redirect(
         path,
         append=False,
