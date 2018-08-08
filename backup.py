@@ -11,12 +11,12 @@ root = logging.getLogger()
 root.setLevel(logging.INFO)
 
 p = configargparse.ArgumentParser()
-p.add('--db', required=True, help='database url (e.g. mysql://mysql@localhost/db)',
+p.add('--db', required=True, help='database url (e.g. mongodb://mongo@localhost/db)',
       env_var='DATABASE_URL')
 p.add('--ftp', required=True, help='FTP url (e.g. ftp://backup:password@backup.network/backups/mydb)',
       env_var='FTP_URL')
-p.add('--mysqldump', required=False, help='mysqldump path command',
-      env_var='MYSQLDUMP_COMMAND', default='mysqldump')
+p.add('--mongodump', required=False, help='mongodump path command',
+      env_var='MONGODUMP_COMMAND', default='mongodump')
 p.add('--max', required=False, help='maximum count of backups',
       env_var='MAX_FILES', default=5)
 p.add('--name', required=False, help='backup name',
@@ -34,16 +34,16 @@ def backup_front_name(database):
 def backup_name(database):
     now = datetime.now()
     now = now.replace(microsecond=0)
-    return backup_front_name(database) + '-' + now.isoformat() + ".sql"
+    return backup_front_name(database) + '-' + now.isoformat() + ".mgdb"
 
 
-def backup(database, ftp, mysqldump):
+def backup(database, ftp, mongodump):
     logging.info('Starting backup')
     name = backup_name(database)
     path = '/tmp/' + name
     logging.info('Backup database to {}'.format(path))
     db = dj_database_url.parse(database)
-    s.bash('-c', '"'+' '.join([mysqldump, '-u', db['USER'], '-p'+db['PASSWORD'], '-h', db['HOST'], '-P', str(db['PORT']), db['NAME']]) + '"').redirect(
+    s.bash('-c', '"'+' '.join([mongodump, '--uri', database]) + '"').redirect(
         path,
         append=False,
         stdout=True,
@@ -80,4 +80,4 @@ def backup(database, ftp, mysqldump):
 
 
 if __name__ == '__main__':
-    backup(options.db, options.ftp, options.mysqldump)
+    backup(options.db, options.ftp, options.mongodump)
