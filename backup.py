@@ -34,7 +34,7 @@ def backup_front_name(database):
 def backup_name(database):
     now = datetime.now()
     now = now.replace(microsecond=0)
-    return backup_front_name(database) + '-' + now.isoformat() + ".mgdb"
+    return backup_front_name(database) + '-' + now.isoformat() + ".gz"
 
 
 def backup(database, ftp, mongodump):
@@ -42,17 +42,9 @@ def backup(database, ftp, mongodump):
     name = backup_name(database)
     path = '/tmp/' + name
     logging.info('Backup database to {}'.format(path))
-    s.bash('-c', '"'+' '.join([mongodump, '--uri', database]) + '"').redirect(
-        path,
-        append=False,
-        stdout=True,
-        stderr=False).run()
+    s.bash('-c', '"'+' '.join([mongodump, '--uri', database, '--archive', path, '--gzip']) + '"').run()
 
-    s.tar('cf', path + '.tar.gz', path).run()
-
-    s.rm(path).run()
-
-    path = path + '.tar.gz'
+    path = path + '.gz'
 
     ftp = urlparse.urlparse(ftp, 'ftp')
     logging.info('Sending backup {} to {}'.format(path, ftp.hostname))
@@ -65,7 +57,7 @@ def backup(database, ftp, mongodump):
     # noinspection PyDeprecation
     with ftputil.FTPHost(host, ftp.username, ftp.password) as host:
         host.makedirs(ftp.path)
-        host.upload_if_newer(path, ftp.path + name + '.tar.gz')
+        host.upload_if_newer(path, ftp.path + name + '.gz')
         host.chdir(ftp.path)
         files = [file for file in host.listdir(ftp.path) if file.startswith(backup_front_name(database))]
         files.sort()
