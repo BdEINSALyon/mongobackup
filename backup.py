@@ -44,7 +44,6 @@ def backup(database, ftp, mongodump):
     logging.info('Backup database to {}'.format(path))
     s.bash('-c', '"'+' '.join([mongodump, '--uri', database, '--archive', path, '--gzip']) + '"').run()
 
-    path = path + '.gz'
 
     ftp = urlparse.urlparse(ftp, 'ftp')
     logging.info('Sending backup {} to {}'.format(path, ftp.hostname))
