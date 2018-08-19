@@ -42,7 +42,7 @@ def backup(database, ftp, mongodump):
     name = backup_name(database)
     path = '/tmp/' + name
     logging.info('Backup database to {}'.format(path))
-    s.bash('-c', '"'+' '.join([mongodump, '--uri', database, '--archive', path, '--gzip']) + '"').run()
+    s.bash('-c', '"'+' '.join([mongodump, '--uri', database, '--archive=' + path, '--gzip']) + '"').run()
 
 
     ftp = urlparse.urlparse(ftp, 'ftp')
@@ -56,7 +56,7 @@ def backup(database, ftp, mongodump):
     # noinspection PyDeprecation
     with ftputil.FTPHost(host, ftp.username, ftp.password) as host:
         host.makedirs(ftp.path)
-        host.upload_if_newer(path, ftp.path + name + '.gz')
+        host.upload_if_newer(path, ftp.path + name)
         host.chdir(ftp.path)
         files = [file for file in host.listdir(ftp.path) if file.startswith(backup_front_name(database))]
         files.sort()
