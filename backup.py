@@ -1,6 +1,6 @@
 import logging
 
-import dj_database_url
+import dj_mongo_database_url
 import configargparse
 from datetime import datetime
 from sultan.api import Sultan
@@ -27,7 +27,7 @@ s = Sultan()
 
 
 def backup_front_name(database):
-    db = dj_database_url.parse(database)
+    db = dj_mongo_database_url.parse(database)
     return db.get('HOST', default='mongo') + '-' + db.get('NAME', default='db') + '-' + options.name
 
 
