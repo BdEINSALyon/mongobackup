@@ -28,7 +28,7 @@ s = Sultan()
 
 def backup_front_name(database):
     db = dj_database_url.parse(database)
-    return db['HOST'] + '-' + db['NAME'] + '-' + options.name
+    return db.get('HOST', default='mongo') + '-' + db.get('NAME', default='db') + '-' + options.name
 
 
 def backup_name(database):
